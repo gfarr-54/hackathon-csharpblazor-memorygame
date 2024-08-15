@@ -9,8 +9,8 @@
 *@
 
 
-<div class="card" @onclick="ToggleIsFlipped">
-    <p>@(IsFlipped ? @Id : "?")</p>
+<div  class="card" @onclick="ToggleIsFlipped">
+      <p>@(IsFlipped ? @MemoryGame.GetMatchID(Id) : "?")</p>
 </div>
 
 @code {
@@ -20,8 +20,24 @@
     [Parameter]
     public int Id { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        if (MemoryGame.ResetFlippedCards && IsFlipped)
+        {
+            IsFlipped = false;
+        }
+    }
+
     public void ToggleIsFlipped()
     {
         IsFlipped = !IsFlipped;
+        if (IsFlipped)
+        {
+            MemoryGame.FlipCard(Id);
+            if (MemoryGame.ResetFlippedCards)
+            {
+                MemoryGame.ResetFlippedCards = false;
+            }
+        }
     }
 }

@@ -21,3 +21,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+
+// initialize memoryGameLogic
+
