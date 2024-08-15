@@ -19,12 +19,37 @@
 <div class="gamescreen">
     @foreach (var card in MemoryGame.Cards)
     {
-        <Card Id="@card.Id"/>
+        <Card Id="@card.Id" MatchId="@card.MatchId" OnCardClicked="HandleCardClick" OnCardInitialized="HandleCardInitialzed" />
     }
 </div>
 <button @onclick="EndGame">End Game</button>
 
 @code {
+
+    private List<Card> cards = new List<Card>();
+
+    private async void HandleCardClick(int cardId)
+    {
+        // Handle the click event for the card with the specified cardId
+        // You can implement your logic here
+        if (MemoryGame.ResetFlippedCards)
+        {
+            await Task.Delay(2000); // Wait for 5 seconds
+            foreach (var card in cards)
+            {
+                if (card.IsFlipped && !card.IsMatched)
+                {
+                    card.ToggleIsFlipped();
+                }
+            }
+            MemoryGame.ResetFlippedCards = false;
+        }
+    }
+
+    private void HandleCardInitialzed(Card card)
+    {
+        cards.Add(card);
+    }
 
     // The size of the deck (number of cards)
     private int DeckSize { get; set; } = 16;

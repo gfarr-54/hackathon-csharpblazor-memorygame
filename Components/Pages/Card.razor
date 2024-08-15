@@ -10,7 +10,7 @@
 
 
 <div  class="card" @onclick="ToggleIsFlipped">
-      <p>@(IsFlipped ? @MemoryGame.GetMatchID(Id) : "?")</p>
+      <p>@(IsFlipped ? MatchId : "?")</p>
 </div>
 
 @code {
@@ -18,26 +18,38 @@
     public bool IsFlipped { get; set; } = false;
 
     [Parameter]
+    public bool IsMatched { get; set; } = false;
+
+    [Parameter]
     public int Id { get; set; }
 
-    protected override void OnParametersSet()
-    {
-        if (MemoryGame.ResetFlippedCards && IsFlipped)
-        {
-            IsFlipped = false;
-        }
-    }
+    [Parameter]
+    public int MatchId { get; set; }
 
-    public void ToggleIsFlipped()
+    [Parameter]
+    public EventCallback<int> OnCardClicked { get; set; } // EventCallback for card click
+
+    [Parameter]
+    public EventCallback<Card> OnCardInitialized { get; set; }
+
+    public async void ToggleIsFlipped()
     {
         IsFlipped = !IsFlipped;
         if (IsFlipped)
         {
             MemoryGame.FlipCard(Id);
-            if (MemoryGame.ResetFlippedCards)
+            if (MemoryGame.Cards.First(c => c.Id == Id).IsMatched)
             {
-                MemoryGame.ResetFlippedCards = false;
+                IsMatched = true;
             }
+            await OnCardClicked.InvokeAsync(Id); // Notify parent component
         }
+    }
+
+    protected async override void OnInitialized()
+    {
+        base.OnInitialized();
+        await OnCardInitialized.InvokeAsync(this);
+        
     }
 }
